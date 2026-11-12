@@ -3,7 +3,7 @@ from telebot.types import LabeledPrice
 import random
 
 # ТОКЕН БОТА
-TELEGRAM_TOKEN = "9037182564:AAHjmJ3py0q2cKHAGfvI-rba83fUpTjJkwQ"
+TELEGRAM_TOKEN = "9037182564:AAF8t7WjlmrdSWmNsQV0nWxDkZM8LK-CwDc"
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 # Память для связей (кто кого пригласил)
