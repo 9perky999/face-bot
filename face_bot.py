@@ -3,7 +3,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 import random
 
 # ТОКЕН БОТА
-TELEGRAM_TOKEN = "ТВОЙ_ТОКЕН_ТУТ"
+TELEGRAM_TOKEN = "9037182564:AAF8t7WjlmrdSWmNsQV0nWxDkZM8LK-CwDc"
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 victims = {}
