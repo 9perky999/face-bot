@@ -1,2 +1,2 @@
-pyTelegramBoyAPI
+pyTelegramBotAPI
 Flask
