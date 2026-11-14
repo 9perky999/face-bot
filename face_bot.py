@@ -6,7 +6,7 @@ import random
 import os
 
 # ТОКЕН БОТА (ВСТАВЬ СВОЙ)
-TELEGRAM_TOKEN = "9037182564:AAF8t7WjlmrdSWmNsQV0nWxDkZM8LK-CwDc"
+TELEGRAM_TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
 victims = {}
