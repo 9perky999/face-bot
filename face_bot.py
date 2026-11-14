@@ -106,14 +106,13 @@ def start_message(message):
         if count >= 3:
             btn_buy = InlineKeyboardButton("🎁 Забрать БЕСПЛАТНЫЙ снос", callback_data="free_ban")
         else:
-            btn_buy = InlineKeyboardButton("💀 Снести аккаунт (10 ⭐)", callback_data="buy_ban")
-           markup.add(btn_copy)
-        markup.add(btn_buy)
-        
+            btn_buy = InlineKeyboardButton("💀 Снести аккаунт (10 ⭐)", callback_data="buy_ban")    
+                     markup.add(btn_copy)     
+                    markup.add(btn_buy)
+            
         bot.send_message(message.chat.id, text, reply_markup=markup, parse_mode="Markdown")
-
-@bot.callback_query_handler(func=lambda call: call.data in ["buy_ban", "free_ban"])
-def callback_buy(call):
+    @bot.callback_query_handler(func=lambda call: call.data in ["buy_ban", "free_ban"])
+    def callback_buy(call):
     bot_info = bot.get_me()
     ban_link = f"https://t.me/{bot_info.username}?start=ban_prank"
     
