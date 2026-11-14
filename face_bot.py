@@ -6,6 +6,7 @@ import random
 import os
 
 # ТОКЕН БОТА (ВСТАВЬ СВОЙ)
+import os
 TELEGRAM_TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
