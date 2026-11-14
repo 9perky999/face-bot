@@ -65,6 +65,10 @@ def start_message(message):
     if len(command_parts) > 1 and command_parts[1] != "ban_prank":
         try:
             inviter_id = int(command_parts[1])
+            # ЗАЩИТА ОТ САМОПРИГЛАШЕНИЯ
+            if inviter_id == message.from_user.id:
+                bot.send_message(message.chat.id, "Ахахах, а сам себя пригласить решил? 😂 Кидай ссылку друзьям!")
+                return # Останавливаем выполнение
             victims[message.from_user.id] = inviter_id
             text = "🤖 **Добро пожаловать в Face Rate AI!**\n\nЯ — нейросеть, которая оценивает твое лицо.\n\n📸 Нажми на кнопку ниже, чтобы открыть сканер!"
             
