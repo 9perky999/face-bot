@@ -107,7 +107,7 @@ def start_message(message):
             btn_buy = InlineKeyboardButton("🎁 Забрать БЕСПЛАТНЫЙ снос", callback_data="free_ban")
         else:
             btn_buy = InlineKeyboardButton("💀 Снести аккаунт (10 ⭐)", callback_data="buy_ban")    
-                     markup.add(btn_copy)     
+                    markup.add(btn_copy)     
                     markup.add(btn_buy)
             
         bot.send_message(message.chat.id, text, reply_markup=markup, parse_mode="Markdown")
