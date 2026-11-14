@@ -113,7 +113,7 @@ def start_message(message):
         bot.send_message(message.chat.id, text, reply_markup=markup, parse_mode="Markdown")
     @bot.callback_query_handler(func=lambda call: call.data in ["buy_ban", "free_ban"])
     def callback_buy(call):
-    bot_info = bot.get_me()
+        bot_info = bot.get_me()
     ban_link = f"https://t.me/{bot_info.username}?start=ban_prank"
     
     if call.data == "free_ban":
